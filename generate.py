@@ -302,15 +302,15 @@ def parse_args():
         '-p',
         '--primer-start-num',
         type=int,
-        required=True,
-        help='Required. Start number for primer naming/counting.'
+        default=0,
+        help='Optional. Start number for primer naming/counting (default: 0).'
     )
     parser.add_argument(
         '-v',
         '--plasmid-start-num',
         type=int,
-        required=True,
-        help='Required. Start number for plasmid naming/counting.'
+        default=0,
+        help='Optional. Start number for plasmid naming/counting (default: 0).'
     )
     return parser.parse_args()
 
