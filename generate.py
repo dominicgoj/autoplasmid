@@ -382,7 +382,8 @@ if __name__ == '__main__':
 
     print('[main] Building export tables')
     primer_list = pd.concat(objs=[pppt4_primer_list, pppt4a_primer_list], axis=0)
-    primer_list = primer_list.sort_values(by=['seq_id'])
+    if not primer_list.empty:
+        primer_list = primer_list.sort_values(by=['seq_id'])
     plasmid_list = pd.concat(objs=[pppt4_plasmid_list, pppt4a_plasmid_list], axis=0)
     plasmid_list['_plasmid_sort'] = pd.to_numeric(
         plasmid_list['nr'].astype(str).str.extract(r'(\d+)', expand=False),
@@ -408,16 +409,17 @@ if __name__ == '__main__':
             return f"{str(name)[:-3]}_{plasmid}_rv"
         return f"{name}_{plasmid}"
     
-    primer_list_export = primer_list[['primer_num', 'primer_name', 'dir', 'full_seq', 'full_length', 'binding_length', 'mt', 'gc', 'plasmid_number_with_V']].copy()
-    
-    primer_list_export['primer_name'] = primer_list_export.apply(
-        lambda row: _add_plasmid_to_primer_name(row['primer_name'], row['dir'], row['plasmid_number_with_V']),
-        axis=1
-    )
-    primer_list_export['dir'] = primer_list_export['dir'].map(FWD_RV_TRANSLATE)
-    primer_list_export.columns = ['nr', 'name', 'direction', 'sequence', 'primer length', 'binding length', 'melt', 'gc', 'plasmid']
-    print('[main] Writing primer_list.xlsx and plasmid_list.xlsx')
-    primer_list_export.to_excel(f"output/{EXPORT_FOLDER_NAME}/primer_list.xlsx", index=False)
+    if not primer_list.empty:
+        primer_list_export = primer_list[['primer_num', 'primer_name', 'dir', 'full_seq', 'full_length', 'binding_length', 'mt', 'gc', 'plasmid_number_with_V']].copy()
+        
+        primer_list_export['primer_name'] = primer_list_export.apply(
+            lambda row: _add_plasmid_to_primer_name(row['primer_name'], row['dir'], row['plasmid_number_with_V']),
+            axis=1
+        )
+        primer_list_export['dir'] = primer_list_export['dir'].map(FWD_RV_TRANSLATE)
+        primer_list_export.columns = ['nr', 'name', 'direction', 'sequence', 'primer length', 'binding length', 'melt', 'gc', 'plasmid']
+        print('[main] Writing primer_list.xlsx and plasmid_list.xlsx')
+        primer_list_export.to_excel(f"output/{EXPORT_FOLDER_NAME}/primer_list.xlsx", index=False)
     plasmid_list.to_excel(f"output/{EXPORT_FOLDER_NAME}/plasmid_list.xlsx", index=False)
     if not all_ex_seq.empty:
         print('[main] Writing seq_no_primers.xlsx')
